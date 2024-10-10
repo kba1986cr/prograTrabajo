@@ -1,8 +1,33 @@
 <?php
+// Inicia la sesión y verifica que el usuario ha iniciado sesión
 session_start();
 if (!isset($_SESSION['usuario'])) {
     header("Location: login.php");
     exit();
+}
+
+// Incluye el archivo de conexión y procesa el formulario si es una solicitud POST
+include("conexion.php");
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $dia = $_POST['dia'];
+    $turno = $_POST['turno'];
+    $hora_inicio = $_POST['hora_inicio'];
+    $hora_fin = $_POST['hora_fin'];
+    $nota = $_POST['nota'];
+
+    $conn = conectar();
+    $sql = "INSERT INTO turnos (dia, turno, hora_inicio, hora_fin, nota) VALUES (?, ?, ?, ?, ?)";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("sssss", $dia, $turno, $hora_inicio, $hora_fin, $nota);
+
+    if ($stmt->execute()) {
+        echo "Registro exitoso";
+    } else {
+        echo "Error al registrar: " . $conn->error;
+    }
+
+    $stmt->close();
+    $conn->close();
 }
 ?>
 <!DOCTYPE html>
