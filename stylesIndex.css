@@ -4,14 +4,13 @@ body {
     color: #ffffff;
     font-family: Arial, sans-serif;
     margin: 0;
+    flex-direction: column;
+    align-items: center;
 }
 
-h2{
+h2 {
     color: white;
-    text-shadow: 0px 0px 10px cyan,
-                 0px 0px 20px cyan,
-                 0px 0px 40px cyan,
-                 0px 0px 80px cyan;
+    text-shadow: 0px 0px 10px cyan, 0px 0px 20px cyan, 0px 0px 40px cyan, 0px 0px 80px cyan;
 }
 
 .sidebar {
@@ -22,16 +21,20 @@ h2{
     flex-direction: column;
     position: relative;
 }
+
 .sidebar h2 {
     cursor: pointer;
 }
+
 .menu-content {
     display: none;
     flex-direction: column;
 }
+
 .menu-content.active {
     display: flex;
 }
+
 .menu-item {
     background-color: #3e3e3e;
     padding: 10px;
@@ -40,49 +43,25 @@ h2{
     cursor: pointer;
     text-align: center;
 }
+
 .menu-item:hover {
     background-color: #bb86fc;
 }
+
 .content {
-    flex-grow: 1;
-    padding: 20px;
     display: flex;
+    justify-content: center;
+    width: 100%;
+    max-width: 800px;
 }
+
 .calendario {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
     gap: 5px;
     max-width: 700px;
-    margin: 0 auto;
 }
-.dia {
-    padding: 10px;
-    border-radius: 5px;
-    background-color: #3e3e3e;
-    cursor: pointer;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-    transition: all 0.3s ease;
-}
-.hidden {
-    display: none;
-}
-.turno-select, .nota, .actions {
-    margin-top: 5px;
-    width: 100%;
-}
-.boton {
-    padding: 5px;
-    background-color: #bb86fc;
-    border: none;
-    color: white;
-    cursor: pointer;
-    border-radius: 3px;
-    margin-right: 5px;
-}
+
 .month-scroll {
     margin-left: 20px;
     overflow-y: auto;
@@ -92,6 +71,7 @@ h2{
     border-radius: 5px;
     padding: 10px;
 }
+
 .month-item {
     padding: 10px;
     cursor: pointer;
@@ -100,9 +80,36 @@ h2{
     margin-bottom: 5px;
     border-radius: 5px;
 }
+
 .month-item:hover {
     background-color: #bb86fc;
 }
-.month-item.selected {
-    background-color: #9b5dfc;
+
+.detalle-dia {
+    width: 100%;
+    max-width: 800px;
+    margin-top: 20px;
+    padding: 15px;
+    border: 1px solid #ccc;
+    background-color: #2e2e2e;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+}
+
+.turno-select, .nota, .actions {
+    margin-top: 5px;
+    width: 100%;
+}
+
+.boton {
+    padding: 5px;
+    background-color: #bb86fc;
+    border: none;
+    color: white;
+    cursor: pointer;
+    border-radius: 3px;
+    margin-right: 5px;
 }
