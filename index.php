@@ -36,7 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Calendario Interactivo con Turnos y Notas</title>
-    <link rel="stylesheet" href="styleIndex.css">
+    <link rel="stylesheet" href="stylesIndex.css">
 </head>
 <body>
     <div class="sidebar">

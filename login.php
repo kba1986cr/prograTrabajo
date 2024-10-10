@@ -7,7 +7,7 @@ session_start();
 <head>
     <meta charset="UTF-8">
     <title>Iniciar Sesión</title>
-    <link rel="stylesheet" href="styleLogin.css">
+    <link rel="stylesheet" href="stylesLogin.css">
 </head>
 <body>
     <form action="procesar_login.php" method="POST">
