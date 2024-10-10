@@ -53,21 +53,46 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <div class="content">
         <div class="calendario" id="calendario"></div>
         <div class="month-scroll" id="month-scroll"></div>
+        
+        <!-- Contenedor de Detalles del Día Seleccionado -->
+        <div class="detalle-dia" id="detalle-dia" style="display: none;">
+            <h3 id="dia-seleccionado">Día seleccionado:</h3>
+            <select id="turno-select" class="turno-select">
+                <option value="">Seleccionar Turno</option>
+                <!-- Opciones de turno se agregan dinámicamente -->
+            </select>
+            <input id="hora-inicio" type="time" class="hora-inicio hidden">
+            <input id="hora-fin" type="time" class="hora-fin hidden">
+            <textarea id="nota" class="nota" placeholder="Notas del día..."></textarea>
+            <div class="actions">
+                <button class="boton" onclick="guardar()">Guardar</button>
+                <button class="boton" onclick="actualizar()">Actualizar</button>
+                <button class="boton" onclick="eliminar()">Eliminar</button>
+            </div>
+        </div>
     </div>
 
     <script>
         const calendario = document.getElementById('calendario');
         const monthScroll = document.getElementById('month-scroll');
+        const detalleDia = document.getElementById('detalle-dia');
+        const diaSeleccionado = document.getElementById('dia-seleccionado');
+        const turnoSelect = document.getElementById('turno-select');
+        const horaInicio = document.getElementById('hora-inicio');
+        const horaFin = document.getElementById('hora-fin');
+        const nota = document.getElementById('nota');
+        let selectedDay;
+
         const months = [
             'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
             'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
         ];
         const turnos = [
-            { nombre: "Administrativo", horas: { lun_jue: ["16:00", "22:00"], vie: ["15:00", "22:00"] }},
-            { nombre: "Citas", horas: { general: ["03:00", "06:00"], tarde: ["14:00", "22:00"] }},
-            { nombre: "1er Turno", horas: { general: ["03:00", "06:00"], tarde: ["14:00", "22:00"] }},
-            { nombre: "2do Turno", horas: { manana: ["03:00", "14:00"], noche: ["22:00", "10:00"] }},
-            { nombre: "3er Turno", horas: { general: ["14:00", "22:00"], noche: ["06:00", "18:00"] }}
+            { nombre: "Administrativo", horas: { general: ["16:00", "22:00"] }},
+            { nombre: "Citas", horas: { general: ["03:00", "06:00"] }},
+            { nombre: "1er Turno", horas: { general: ["03:00", "06:00"] }},
+            { nombre: "2do Turno", horas: { general: ["03:00", "14:00"] }},
+            { nombre: "3er Turno", horas: { general: ["14:00", "22:00"] }}
         ];
         let currentMonth = new Date().getMonth();
         let currentYear = new Date().getFullYear();
@@ -78,66 +103,64 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             for (let i = 1; i <= daysInMonth; i++) {
                 const dia = document.createElement('div');
                 dia.classList.add('dia');
-                const titulo = document.createElement('div');
-                titulo.innerText = `Día ${i}`;
-                
-                const turnoSelect = document.createElement('select');
-                turnoSelect.classList.add('turno-select');
-                turnoSelect.innerHTML = `<option value="">Seleccionar Turno</option>`;
-                turnos.forEach((turno, index) => {
-                    turnoSelect.innerHTML += `<option value="${index}">${turno.nombre}</option>`;
-                });
-
-                const horaInicio = document.createElement('input');
-                horaInicio.type = 'time';
-                horaInicio.classList.add('hora-inicio', 'hidden');
-                
-                const horaFin = document.createElement('input');
-                horaFin.type = 'time';
-                horaFin.classList.add('hora-fin', 'hidden');
-
-                turnoSelect.addEventListener('change', (e) => {
-                    const turnoIndex = e.target.value;
-                    if (turnoIndex) {
-                        const turnoSeleccionado = turnos[turnoIndex];
-                        horaInicio.classList.remove('hidden');
-                        horaFin.classList.remove('hidden');
-                        horaInicio.min = turnoSeleccionado.horas.general[0];
-                        horaInicio.max = turnoSeleccionado.horas.general[1];
-                        horaFin.min = turnoSeleccionado.horas.general[0];
-                        horaFin.max = turnoSeleccionado.horas.general[1];
-                    } else {
-                        horaInicio.classList.add('hidden');
-                        horaFin.classList.add('hidden');
-                    }
-                });
-
-                const nota = document.createElement('textarea');
-                nota.classList.add('nota', 'hidden');
-                nota.placeholder = "Notas del día...";
-
-                const actions = document.createElement('div');
-                actions.classList.add('actions', 'hidden');
-                actions.innerHTML = `
-                    <button class="boton" onclick="guardar(${i})">Guardar</button>
-                    <button class="boton" onclick="actualizar(${i})">Actualizar</button>
-                    <button class="boton" onclick="eliminar(${i})">Eliminar</button>
-                `;
-
-                dia.appendChild(titulo);
-                dia.appendChild(turnoSelect);
-                dia.appendChild(horaInicio);
-                dia.appendChild(horaFin);
-                dia.appendChild(nota);
-                dia.appendChild(actions);
-                calendario.appendChild(dia);
+                dia.innerText = `Día ${i}`;
 
                 dia.addEventListener('click', () => {
-                    turnoSelect.classList.toggle('hidden');
-                    nota.classList.toggle('hidden');
-                    actions.classList.toggle('hidden');
+                    selectedDay = i;
+                    diaSeleccionado.innerText = `Día seleccionado: ${selectedDay}`;
+                    detalleDia.style.display = 'block';
+                    turnoSelect.innerHTML = '<option value="">Seleccionar Turno</option>';
+                    
+                    turnos.forEach((turno, index) => {
+                        const option = document.createElement('option');
+                        option.value = index;
+                        option.textContent = turno.nombre;
+                        turnoSelect.appendChild(option);
+                    });
+
+                    // Reset y esconder inputs al cambiar de día
+                    turnoSelect.value = '';
+                    horaInicio.value = '';
+                    horaInicio.classList.add('hidden');
+                    horaFin.value = '';
+                    horaFin.classList.add('hidden');
+                    nota.value = '';
                 });
+                
+                calendario.appendChild(dia);
             }
+        }
+
+        // Añade eventos al selector de turnos y muestra las horas adecuadas
+        turnoSelect.addEventListener('change', (e) => {
+            const turnoIndex = e.target.value;
+            if (turnoIndex) {
+                const turnoSeleccionado = turnos[turnoIndex];
+                horaInicio.classList.remove('hidden');
+                horaFin.classList.remove('hidden');
+                horaInicio.min = turnoSeleccionado.horas.general[0];
+                horaInicio.max = turnoSeleccionado.horas.general[1];
+                horaFin.min = turnoSeleccionado.horas.general[0];
+                horaFin.max = turnoSeleccionado.horas.general[1];
+            } else {
+                horaInicio.classList.add('hidden');
+                horaFin.classList.add('hidden');
+            }
+        });
+
+        function guardar() {
+            alert(`Guardando los datos para el día ${selectedDay}`);
+            // Aquí puedes añadir lógica para enviar los datos al servidor con AJAX o un formulario oculto
+        }
+
+        function actualizar() {
+            alert(`Actualizando los datos para el día ${selectedDay}`);
+            // Aquí puedes añadir lógica para actualizar los datos en el servidor
+        }
+
+        function eliminar() {
+            alert(`Eliminando los datos para el día ${selectedDay}`);
+            // Aquí puedes añadir lógica para eliminar los datos en el servidor
         }
 
         function renderMonthScroll() {
