@@ -31,7 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 }
 ?>
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -39,7 +39,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <link rel="stylesheet" href="stylesIndex.css">
 </head>
 <body>
-    <div class="sidebar">
+<div class="sidebar">
         <h2 onclick="toggleMenu()">Menú</h2>
         <div class="menu-content">
             <div class="menu-item">Opción 1</div>
