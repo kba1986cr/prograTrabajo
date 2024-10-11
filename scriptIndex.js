@@ -7,6 +7,8 @@ const horaInicio = document.getElementById('hora-inicio');
 const horaFin = document.getElementById('hora-fin');
 const nota = document.getElementById('nota');
 let selectedDay;
+let selectedTurno;
+let existeRegistro = false;
 
 const months = [
     'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
@@ -73,19 +75,91 @@ turnoSelect.addEventListener('change', (e) => {
     }
 });
 
+function createDayElement(day) {
+    const dia = document.createElement('div');
+    dia.classList.add('dia');
+    dia.innerText = `Día ${day}`;
+
+    dia.addEventListener('click', () => handleDayClick(day));
+    
+    return dia;
+}
+
+function handleDayClick(day) {
+    selectedDay = day;
+    diaSeleccionado.innerText = `Día seleccionado: ${selectedDay}`;
+    detalleDia.style.display = 'block';
+    
+    populateTurnoSelect();
+    resetInputs();
+    checkRegistro(selectedDay, turnoSelect.value);
+}
+
+function populateTurnoSelect() {
+    turnoSelect.innerHTML = '<option value="">Seleccionar Turno</option>';
+    turnos.forEach((turno, index) => {
+        const option = document.createElement('option');
+        option.value = index;
+        option.textContent = turno.nombre;
+        turnoSelect.appendChild(option);
+    });
+}
+
+function resetInputs() {
+    turnoSelect.value = '';
+    horaInicio.value = '';
+    horaInicio.classList.add('hidden');
+    horaFin.value = '';
+    horaFin.classList.add('hidden');
+    nota.value = '';
+}
+
+function checkRegistro(dia, turnoIndex) {
+    // Aquí deberías hacer una llamada AJAX para comprobar si existe un registro
+    const existe = Math.random() < 0.5; // Simulación: 50% de chance de que exista un registro
+    existeRegistro = existe;
+
+    toggleActionButtons(existeRegistro);
+}
+
+function toggleActionButtons(existe) {
+    const buttons = document.querySelectorAll(".actions button");
+    buttons[1].style.display = existe ? 'inline' : 'none'; // Botón Actualizar
+    buttons[2].style.display = existe ? 'inline' : 'none'; // Botón Eliminar
+}
+
+function enviarSolicitud(accion) {
+    const turnoIndex = turnoSelect.value;
+    if (turnoIndex) {
+        const turno = turnos[turnoIndex];
+        const params = `dia=${selectedDay}&turno=${turno.nombre}&hora_inicio=${horaInicio.value}&hora_fin=${horaFin.value}&nota=${nota.value}&accion=${accion}`;
+        
+        const xhr = new XMLHttpRequest();
+        xhr.open("POST", "index.php", true);
+        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
+                alert(xhr.responseText); // Mensaje de éxito o error
+            }
+        };
+        xhr.send(params);
+    }
+}
+
 function guardar() {
-    alert(`Guardando los datos para el día ${selectedDay}`);
-    // Aquí puedes añadir lógica para enviar los datos al servidor con AJAX o un formulario oculto
+    const turnoIndex = turnoSelect.value;
+    if (turnoIndex) {
+        const turno = turnos[turnoIndex];
+        enviarSolicitud('guardar');
+    }
 }
 
 function actualizar() {
-    alert(`Actualizando los datos para el día ${selectedDay}`);
-    // Aquí puedes añadir lógica para actualizar los datos en el servidor
+    enviarSolicitud('actualizar');
 }
 
 function eliminar() {
-    alert(`Eliminando los datos para el día ${selectedDay}`);
-    // Aquí puedes añadir lógica para eliminar los datos en el servidor
+    enviarSolicitud('eliminar');
 }
 
 function renderMonthScroll() {
@@ -116,6 +190,16 @@ function toggleMenu() {
 function cerrarSesion() {
     window.location.href = "login.php";
 }
+turnoSelect.addEventListener('change', function() {
+    const turnoIndex = turnoSelect.value;
+    if (turnoIndex) {
+        horaInicio.classList.remove('hidden');
+        horaFin.classList.remove('hidden');
+    } else {
+        horaInicio.classList.add('hidden');
+        horaFin.classList.add('hidden');
+    }
+})
 
 renderMonthScroll();
 renderCalendar(currentMonth, currentYear);
