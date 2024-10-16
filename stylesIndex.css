@@ -16,6 +16,7 @@ h2{
 
 .sidebar {
     width: 200px;
+    height: fit-content;
     padding: 20px;
     background-color: #2e2e2e;
     display: flex;
@@ -67,12 +68,23 @@ h2{
     position: relative;
     transition: all 0.3s ease;
 }
+
+.detalle-dia{
+    background-color: #5dfc6d;
+    width: 95%;      /* Ocupa todo el ancho de la pantalla */
+    position: fixed;  /* Fija el div en la pantalla */
+    bottom: 300px;        /* Lo ubica en la parte inferior */
+    left: 10px;          /* Alinea el div al borde izquierdo */
+    padding: 4px;    /* Agrega espacio interior */
+    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.3); /* Sombra para darle efecto */
+}
+
 .hidden {
     display: none;
 }
 .turno-select, .nota, .actions {
     margin-top: 5px;
-    width: 100%;
+    width: 95%;
 }
 .boton {
     padding: 5px;
