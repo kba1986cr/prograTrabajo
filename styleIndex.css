@@ -105,7 +105,7 @@ De aca va el resto
 }
 
 .detalle-dia{
-  background-color: #5dfc6d;
+  background-color: #2e2e2e;
   width: 95%;      /* Ocupa todo el ancho de la pantalla */
   position: flex;  /* Fija el div en la pantalla */
   bottom: 300px;        /* Lo ubica en la parte inferior */
@@ -131,10 +131,10 @@ De aca va el resto
   margin-right: 5px;
 }
 .month-scroll {
-  margin-left: 20px;
+  margin: 20px;
   overflow-y: auto;
-  max-height: 500px;
-  width: 150px;
+  max-height: auto;
+  width: auto;
   background-color: #2e2e2e;
   border-radius: 5px;
   padding: 10px;
