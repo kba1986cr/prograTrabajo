@@ -1,89 +1,104 @@
-
 body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-    background-color: #1e1e1e;
-    color: #ffffff;
-  }
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: #1e1e1e;
+  color: #ffffff;
+}
 
-  header {
-    background-color: #333;
-    color: #fff;
-    padding: 10px;
-    text-align: center;
-  }
+header {
+  background-color: #333;
+  color: #fff;
+  padding: 10px;
+  text-align: center;
+}
 
-  nav {
-    background-color: #555;
-    padding: 10px;
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-  }
+nav {
+  background-color: #555;
+  padding: 10px;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+}
 
-  nav a {
-    color: #fff;
-    margin-right: 10px;
-    text-decoration: none;
-  }
+nav a {
+  color: #fff;
+  margin-right: 10px;
+  text-decoration: none;
+}
 
-  .main-content {
-    display: flex;
-    flex: 1;
-  }
+.main-content {
+  display: flex;
+  flex: 1;
+}
 
-  .left-section {
-    width: 60%;
-    padding: 20px;
-  }
+.left-section {
+  width: 60%;
+  padding: 20px;
+}
 
-  .left-section header {
-    background-color: #666;
-    color: #fff;
-    padding: 10px;
-  }
+.left-section header {
+  background-color: #666;
+  color: #fff;
+  padding: 10px;
+}
 
-  .left-section .div {
-    background-color: #ccc;
-    padding: 10px;
-    margin-top: 10px;
-  }
+.left-section .div {
+  background-color: #ccc;
+  padding: 10px;
+  margin-top: 10px;
+}
 
-  .left-section .section {
-    background-color: #ddd;
-    padding: 10px;
-    margin-top: 10px;
-  }
+.left-section .section {
+  background-color: #ddd;
+  padding: 10px;
+  margin-top: 10px;
+}
 
-  .left-section .retractable-section {
-    background-color: #eee;
-    padding: 10px;
-    margin-top: 10px;
-  }
+.left-section .retractable-section {
+  background-color: #eee;
+  padding: 10px;
+  margin-top: 10px;
+}
 
-  .right-section {
-    width: 40%;
-    padding: 20px;
-    background-color: #f1f1f1;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-  }
+.boton:hover {
+  background-color: #9b5dfc;
+  transform: scale(1.05);
+}
 
-  .right-section .div {
-    background-color: #aaa;
-    padding: 10px;
-    margin-bottom: 10px;
-    flex: 1;
-  }
+.right-section {
+  width: 40%;
+  padding: 20px;
+  background-color: #f1f1f1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.right-section .div {
+  background-color: #aaa;
+  padding: 10px;
+  margin-bottom: 10px;
+  flex: 1;
+}
 
 /*
 De aca va el resto
 */
+.loading {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  padding: 10px 20px;
+  border-radius: 5px;
+}
+
 .calendario {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
@@ -91,6 +106,7 @@ De aca va el resto
   max-width: 700px;
   margin: 0 auto;
 }
+
 .dia {
   padding: 10px;
   border-radius: 5px;
@@ -104,23 +120,33 @@ De aca va el resto
   transition: all 0.3s ease;
 }
 
-.detalle-dia{
+.detalle-dia {
   background-color: #2e2e2e;
-  width: 95%;      /* Ocupa todo el ancho de la pantalla */
-  position: flex;  /* Fija el div en la pantalla */
-  bottom: 300px;        /* Lo ubica en la parte inferior */
-  left: 10px;          /* Alinea el div al borde izquierdo */
-  padding: 4px;    /* Agrega espacio interior */
-  box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.3); /* Sombra para darle efecto */
+  width: 95%;
+  /* Ocupa todo el ancho de la pantalla */
+  position: flex;
+  /* Fija el div en la pantalla */
+  bottom: 300px;
+  /* Lo ubica en la parte inferior */
+  left: 10px;
+  /* Alinea el div al borde izquierdo */
+  padding: 4px;
+  /* Agrega espacio interior */
+  box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.3);
+  /* Sombra para darle efecto */
 }
 
 .hidden {
   display: none;
 }
-.turno-select, .nota, .actions {
+
+.turno-select,
+.nota,
+.actions {
   margin-top: 5px;
   width: 95%;
 }
+
 .boton {
   padding: 5px;
   background-color: #bb86fc;
@@ -130,6 +156,7 @@ De aca va el resto
   border-radius: 3px;
   margin-right: 5px;
 }
+
 .month-scroll {
   margin: 20px;
   overflow-y: auto;
@@ -139,6 +166,28 @@ De aca va el resto
   border-radius: 5px;
   padding: 10px;
 }
+
+.year-controls{
+  margin: auto;
+  overflow-y: auto;
+  max-height: auto;
+  width: auto;
+  background-color: #2e2e2e;
+  border-radius: 5px;
+  padding: 10px;
+  display: flex; /* Pone los botones en una fila, uno al lado del otro */
+  justify-content: center; /* Centra los botones en el contenedor */
+  gap: 10px; /* Espacio entre los botones */
+}
+
+.botonDos {
+  padding: 10px;
+  border-radius: 5px;
+  background-color: #3e3e3e;
+  color: #ccc;
+  cursor: pointer;
+}
+
 .month-item {
   padding: 10px;
   cursor: pointer;
@@ -147,18 +196,18 @@ De aca va el resto
   margin-bottom: 5px;
   border-radius: 5px;
 }
+
 .month-item:hover {
   background-color: #bb86fc;
 }
+
 .month-item.selected {
   background-color: #9b5dfc;
 }
 
-  footer {
-    background-color: #333;
-    color: #fff;
-    text-align: center;
-    padding: 10px;
-  }
-
-  
+footer {
+  background-color: #333;
+  color: #fff;
+  text-align: center;
+  padding: 10px;
+}
