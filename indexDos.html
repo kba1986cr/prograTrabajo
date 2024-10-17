@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calendario</title>
+  <link rel="stylesheet" href="styleIndexDos.css">
+</head>
+
+<body>
+  <header>
+    <h1>Encabezado Principal</h1>
+  </header>
+
+  <nav class="menu-content">
+    <a href="#">Inicio
+      <div class="sidebar">
+        <h2 onclick="toggleMenu()"></h2>
+        <div class="menu-content">
+            <div class="menu-item">Opción 1</div>
+            <div class="menu-item">Opción 2</div>
+            <div class="menu-item">Opción 3</div>
+            <div class="menu-item">Opción 4</div>
+            <div class="menu-item" onclick="cerrarSesion()">Cerrar Sesión</div>
+        </div>
+    </div>
+    </a>
+    <a href="#">Acerca de</a>
+    <a href="#">Servicios</a>
+    <a href="#">Contacto</a>
+  </nav>
+
+  <div class="main-content">
+    <!-- Sección Izquierda (60%) -->
+    <div class="left-section">
+      <header>Encabezado de la Sección Principal</header>
+      <div class="div">
+        <div class="content">
+          <div class="calendario" id="calendario"></div>
+        </div>
+      </div>
+      <section class="retractable-section">
+                  <!-- Contenedor de Detalles del Día Seleccionado -->
+                  <div class="detalle-dia" id="detalle-dia" style="display: none;">
+                    <h3 id="dia-seleccionado">Día seleccionado:</h3>
+                    <select id="turno-select" class="turno-select">
+                        <option value="">Seleccionar Turno</option>
+                        <!-- Opciones de turno se agregan dinámicamente -->
+                    </select>
+                    <input id="hora-inicio" type="time" class="hora-inicio hidden">
+                    <input id="hora-fin" type="time" class="hora-fin hidden">
+                    <textarea id="nota" class="nota" placeholder="Notas del día..."></textarea>
+                    <div class="actions">
+                        <button class="boton" onclick="guardar()">Guardar</button>
+                        <button class="boton" onclick="actualizar()" style="display: none;">Actualizar</button>
+                        <button class="boton" onclick="eliminar()" style="display: none;">Eliminar</button>
+                    </div>
+                </div>
+      </section>
+      <section class="section">Primera Sección</section>
+    </div>
+
+    <!-- Sección Derecha (40%) -->
+    <div class="right-section">
+      <div class="div">
+        <div class="month-scroll" id="month-scroll"></div>
+      </div>
+      <div class="div">Contenido del Div 2</div>
+    </div>
+  </div>
+
+  <footer>
+    <p>Pie de Página</p>
+  </footer>
+  <script src="scriptIndexUno.js"></script>
+</body>
+</html>

@@ -1,0 +1,527 @@
+<?php
+// Inicia la sesión y verifica que el usuario ha iniciado sesión
+session_start();
+if (!isset($_SESSION['usuario'])) {
+    header("Location: login.php");
+    exit();
+}
+
+// Incluye el archivo de conexión
+include("conexion.php");
+$conn = conectar();
+
+// Procesa el formulario si es una solicitud POST
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $dia = $_POST['dia'] ?? '';
+    $turno = $_POST['turno'] ?? '';
+    $hora_inicio = $_POST['hora_inicio'] ?? '';
+    $hora_fin = $_POST['hora_fin'] ?? '';
+    $nota = $_POST['nota'] ?? '';
+    $accion = $_POST['accion'] ?? '';
+
+    if ($accion === 'guardar') {
+        $sql = "INSERT INTO turnos (dia, turno, hora_inicio, hora_fin, nota) VALUES (?, ?, ?, ?, ?)";
+    } elseif ($accion === 'actualizar') {
+        $sql = "UPDATE turnos SET hora_inicio = ?, hora_fin = ?, nota = ? WHERE dia = ? AND turno = ?";
+    } elseif ($accion === 'eliminar') {
+        $sql = "DELETE FROM turnos WHERE dia = ? AND turno = ?";
+    } else {
+        die("Acción no válida.");
+    }
+
+    $stmt = $conn->prepare($sql);
+    
+    if ($accion === 'guardar') {
+        $stmt->bind_param("sssss", $dia, $turno, $hora_inicio, $hora_fin, $nota);
+    } elseif ($accion === 'actualizar') {
+        $stmt->bind_param("sssss", $hora_inicio, $hora_fin, $nota, $dia, $turno);
+    } elseif ($accion === 'eliminar') {
+        $stmt->bind_param("ss", $dia, $turno);
+    }
+
+    if ($stmt->execute()) {
+        echo ucfirst($accion) . " exitoso.";
+    } else {
+        echo "Error al " . $accion . ": " . $conn->error;
+    }
+
+    $stmt->close();
+    $conn->close();
+}
+?>
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calendario</title>
+  <link rel="stylesheet" href="styleIndex.css">
+  <style>
+      /* Aquí puedes pegar tu estilo CSS */
+      body {
+        display: flex;
+        background-color: #1e1e1e;
+        color: #ffffff;
+        font-family: Arial, sans-serif;
+        margin: 0;
+    }
+    
+    h2{
+        color: white;
+        text-shadow: 0px 0px 10px cyan,
+                     0px 0px 20px cyan,
+                     0px 0px 40px cyan,
+                     0px 0px 80px cyan;
+    }
+    
+    .sidebar {
+        width: 200px;
+        height: fit-content;
+        padding: 20px;
+        background-color: #2e2e2e;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+    }
+    .sidebar h2 {
+        cursor: pointer;
+    }
+    .menu-content {
+        display: none;
+        flex-direction: column;
+    }
+    .menu-content.active {
+        display: flex;
+    }
+    .menu-item {
+        background-color: #3e3e3e;
+        padding: 10px;
+        margin-top: 5px;
+        border-radius: 5px;
+        cursor: pointer;
+        text-align: center;
+    }
+    .menu-item:hover {
+        background-color: #bb86fc;
+    }
+    .content {
+        flex-grow: 1;
+        padding: 20px;
+        display: flex;
+    }
+    .calendario {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 5px;
+        max-width: 700px;
+        margin: 0 auto;
+    }
+    .dia {
+        padding: 10px;
+        border-radius: 5px;
+        background-color: #3e3e3e;
+        cursor: pointer;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        transition: all 0.3s ease;
+    }
+    
+    .detalle-dia{
+        background-color: #5dfc6d;
+        width: 95%;      /* Ocupa todo el ancho de la pantalla */
+        position: fixed;  /* Fija el div en la pantalla */
+        bottom: 300px;        /* Lo ubica en la parte inferior */
+        left: 10px;          /* Alinea el div al borde izquierdo */
+        padding: 4px;    /* Agrega espacio interior */
+        box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.3); /* Sombra para darle efecto */
+    }
+    
+    .hidden {
+        display: none;
+    }
+    .turno-select, .nota, .actions {
+        margin-top: 5px;
+        width: 95%;
+    }
+    .boton {
+        padding: 5px;
+        background-color: #bb86fc;
+        border: none;
+        color: white;
+        cursor: pointer;
+        border-radius: 3px;
+        margin-right: 5px;
+    }
+    .month-scroll {
+        margin-left: 20px;
+        overflow-y: auto;
+        max-height: 500px;
+        width: 150px;
+        background-color: #2e2e2e;
+        border-radius: 5px;
+        padding: 10px;
+    }
+    .month-item {
+        padding: 10px;
+        cursor: pointer;
+        text-align: center;
+        background-color: #3e3e3e;
+        margin-bottom: 5px;
+        border-radius: 5px;
+    }
+    .month-item:hover {
+        background-color: #bb86fc;
+    }
+    .month-item.selected {
+        background-color: #9b5dfc;
+    }
+      /* Tu CSS completo va aquí */
+      
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+
+  header {
+    background-color: #333;
+    color: #fff;
+    padding: 10px;
+    text-align: center;
+  }
+
+  nav {
+    background-color: #555;
+    padding: 10px;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  nav a {
+    color: #fff;
+    margin-right: 10px;
+    text-decoration: none;
+  }
+
+  .main-content {
+    display: flex;
+    flex: 1;
+  }
+
+  .left-section {
+    width: 60%;
+    padding: 20px;
+  }
+
+  .left-section header {
+    background-color: #666;
+    color: #fff;
+    padding: 10px;
+  }
+
+  .left-section .div {
+    background-color: #ccc;
+    padding: 10px;
+    margin-top: 10px;
+  }
+
+  .left-section .section {
+    background-color: #ddd;
+    padding: 10px;
+    margin-top: 10px;
+  }
+
+  .left-section .retractable-section {
+    background-color: #eee;
+    padding: 10px;
+    margin-top: 10px;
+  }
+
+  .right-section {
+    width: 40%;
+    padding: 20px;
+    background-color: #f1f1f1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  .right-section .div {
+    background-color: #aaa;
+    padding: 10px;
+    margin-bottom: 10px;
+    flex: 1;
+  }
+
+  footer {
+    background-color: #333;
+    color: #fff;
+    text-align: center;
+    padding: 10px;
+  }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Encabezado Principal</h1>
+  </header>
+  
+  <nav class="menu-content">
+    <a href="#">Inicio</a>
+    <a href="#">Acerca de</a>
+    <a href="#">Servicios</a>
+    <a href="#">Contacto</a>
+  </nav>
+  
+  <div class="main-content">
+    <div class="left-section">
+      <header>Encabezado de la Sección Principal</header>
+      <div class="div">Contenido del Div</div>
+      <section class="section">Primera Sección</section>
+      <section class="retractable-section">Sección Retráctil</section>
+    </div>
+
+    <div class="right-section">
+      <div class="div">Contenido del Div 1</div>
+      <div class="div">Contenido del Div 2</div>
+    </div>
+  </div>
+  
+  <footer>
+    <p>Pie de Página</p>
+  </footer>
+
+  <div class="detalle-dia" id="detalle-dia" style="display: none;">
+    <h3 id="dia-seleccionado">Día seleccionado:</h3>
+    <select id="turno-select" class="turno-select">
+      <option value="">Seleccionar Turno</option>
+    </select>
+    <input id="hora-inicio" type="time" class="hora-inicio hidden">
+    <input id="hora-fin" type="time" class="hora-fin hidden">
+    <textarea id="nota" class="nota" placeholder="Notas del día..."></textarea>
+    <div class="actions">
+      <button class="boton" onclick="guardar()">Guardar</button>
+      <button class="boton" onclick="actualizar()" style="display: none;">Actualizar</button>
+      <button class="boton" onclick="eliminar()" style="display: none;">Eliminar</button>
+    </div>
+  </div>
+
+  <script>
+      /* Aquí debes incluir el JavaScript necesario para manejar el calendario */
+      const calendario = document.getElementById('calendario');
+const monthScroll = document.getElementById('month-scroll');
+const detalleDia = document.getElementById('detalle-dia');
+const diaSeleccionado = document.getElementById('dia-seleccionado');
+const turnoSelect = document.getElementById('turno-select');
+const horaInicio = document.getElementById('hora-inicio');
+const horaFin = document.getElementById('hora-fin');
+const nota = document.getElementById('nota');
+let selectedDay;
+let selectedTurno;
+let existeRegistro = false;
+
+const months = [
+    'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+    'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+];
+const turnos = [
+    { nombre: "Administrativo", horas: { general: ["16:00", "22:00"] }},
+    { nombre: "Citas", horas: { general: ["03:00", "06:00"] }},
+    { nombre: "1er Turno", horas: { general: ["03:00", "06:00"] }},
+    { nombre: "2do Turno", horas: { general: ["03:00", "14:00"] }},
+    { nombre: "3er Turno", horas: { general: ["14:00", "22:00"] }}
+];
+let currentMonth = new Date().getMonth();
+let currentYear = new Date().getFullYear();
+
+function renderCalendar(month, year) {
+    calendario.innerHTML = '';
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    for (let i = 1; i <= daysInMonth; i++) {
+        const dia = document.createElement('div');
+        dia.classList.add('dia');
+        dia.innerText = `Día ${i}`;
+
+        dia.addEventListener('click', () => {
+            selectedDay = i;
+            diaSeleccionado.innerText = `Día seleccionado: ${selectedDay}`;
+            detalleDia.style.display = 'block';
+            turnoSelect.innerHTML = '<option value="">Seleccionar Turno</option>';
+            
+            turnos.forEach((turno, index) => {
+                const option = document.createElement('option');
+                option.value = index;
+                option.textContent = turno.nombre;
+                turnoSelect.appendChild(option);
+            });
+
+            // Reset y esconder inputs al cambiar de día
+            turnoSelect.value = '';
+            horaInicio.value = '';
+            horaInicio.classList.add('hidden');
+            horaFin.value = '';
+            horaFin.classList.add('hidden');
+            nota.value = '';
+        });
+        
+        calendario.appendChild(dia);
+    }
+}
+
+// Añade eventos al selector de turnos y muestra las horas adecuadas
+turnoSelect.addEventListener('change', (e) => {
+    const turnoIndex = e.target.value;
+    if (turnoIndex) {
+        const turnoSeleccionado = turnos[turnoIndex];
+        horaInicio.classList.remove('hidden');
+        horaFin.classList.remove('hidden');
+        horaInicio.min = turnoSeleccionado.horas.general[0];
+        horaInicio.max = turnoSeleccionado.horas.general[1];
+        horaFin.min = turnoSeleccionado.horas.general[0];
+        horaFin.max = turnoSeleccionado.horas.general[1];
+    } else {
+        horaInicio.classList.add('hidden');
+        horaFin.classList.add('hidden');
+    }
+});
+
+function createDayElement(day) {
+    const dia = document.createElement('div');
+    dia.classList.add('dia');
+    dia.innerText = `Día ${day}`;
+
+    dia.addEventListener('click', () => handleDayClick(day));
+    
+    return dia;
+}
+
+function handleDayClick(day) {
+    selectedDay = day;
+    diaSeleccionado.innerText = `Día seleccionado: ${selectedDay}`;
+    detalleDia.style.display = 'block';
+    
+    populateTurnoSelect();
+    resetInputs();
+    checkRegistro(selectedDay, turnoSelect.value);
+}
+
+function populateTurnoSelect() {
+    turnoSelect.innerHTML = '<option value="">Seleccionar Turno</option>';
+    turnos.forEach((turno, index) => {
+        const option = document.createElement('option');
+        option.value = index;
+        option.textContent = turno.nombre;
+        turnoSelect.appendChild(option);
+    });
+}
+
+function resetInputs() {
+    turnoSelect.value = '';
+    horaInicio.value = '';
+    horaInicio.classList.add('hidden');
+    horaFin.value = '';
+    horaFin.classList.add('hidden');
+    nota.value = '';
+}
+
+function checkRegistro(dia, turnoIndex) {
+    // Aquí deberías hacer una llamada AJAX para comprobar si existe un registro
+    const existe = Math.random() < 0.5; // Simulación: 50% de chance de que exista un registro
+    existeRegistro = existe;
+
+    toggleActionButtons(existeRegistro);
+}
+
+function toggleActionButtons(existe) {
+    const buttons = document.querySelectorAll(".actions button");
+    buttons[1].style.display = existe ? 'inline' : 'none'; // Botón Actualizar
+    buttons[2].style.display = existe ? 'inline' : 'none'; // Botón Eliminar
+}
+
+function enviarSolicitud(accion) {
+    const turnoIndex = turnoSelect.value;
+    if (turnoIndex) {
+        const turno = turnos[turnoIndex];
+        const params = `dia=${selectedDay}&turno=${turno.nombre}&hora_inicio=${horaInicio.value}&hora_fin=${horaFin.value}&nota=${nota.value}&accion=${accion}`;
+        
+        const xhr = new XMLHttpRequest();
+        xhr.open("POST", "index.php", true);
+        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
+                alert(xhr.responseText); // Mensaje de éxito o error
+            }
+        };
+        xhr.send(params);
+    }
+}
+
+function guardar() {
+    const turnoIndex = turnoSelect.value;
+    if (turnoIndex) {
+        const turno = turnos[turnoIndex];
+        enviarSolicitud('guardar');
+    }
+}
+
+function actualizar() {
+    enviarSolicitud('actualizar');
+}
+
+function eliminar() {
+    enviarSolicitud('eliminar');
+}
+
+function renderMonthScroll() {
+    monthScroll.innerHTML = '';
+    months.forEach((month, index) => {
+        const monthItem = document.createElement('div');
+        monthItem.classList.add('month-item');
+        monthItem.innerText = `${month} ${currentYear}`;
+        monthItem.addEventListener('click', () => {
+            currentMonth = index;
+            renderCalendar(currentMonth, currentYear);
+        });
+        monthScroll.appendChild(monthItem);
+    });
+}
+
+monthScroll.addEventListener('wheel', (event) => {
+    event.preventDefault();
+    currentYear += event.deltaY < 0 ? 1 : -1;
+    renderMonthScroll();
+});
+
+function toggleMenu() {
+    const menuContent = document.querySelector('.menu-content');
+    menuContent.classList.toggle('active');
+}
+
+function cerrarSesion() {
+    window.location.href = "login.php";
+}
+turnoSelect.addEventListener('change', function() {
+    const turnoIndex = turnoSelect.value;
+    if (turnoIndex) {
+        horaInicio.classList.remove('hidden');
+        horaFin.classList.remove('hidden');
+    } else {
+        horaInicio.classList.add('hidden');
+        horaFin.classList.add('hidden');
+    }
+})
+
+renderMonthScroll();
+renderCalendar(currentMonth, currentYear);
+
+  </script>
+</body>
+</html>
